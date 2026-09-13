@@ -1,0 +1,82 @@
+name: Deploy to GitHub Pages
+
+# Läuft automatisch bei Push auf den Hauptbranch. Beide gängigen
+# Standard-Branchnamen sind eingetragen, da der tatsächliche Name erst beim
+# Anlegen des GitHub-Repos feststeht (lokal aktuell: "master").
+on:
+  push:
+    branches:
+      - main
+      - master
+  # Erlaubt zusätzlich einen manuellen Lauf über die GitHub-UI, ohne dafür
+  # einen Leer-Commit zu benötigen.
+  workflow_dispatch:
+
+# Kein Secret/Token nötig: `id-token: write` + `pages: write` reichen für die
+# offizielle, tokenlose GitHub-Pages-Deployment-Methode (OIDC + der von
+# GitHub automatisch bereitgestellte GITHUB_TOKEN).
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Verhindert überlappende Deployments; ein bereits laufendes Deployment wird
+# nicht abgebrochen, sondern das nächste wartet.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+
+      - name: Node.js einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Abhängigkeiten installieren (reproduzierbar, aus package-lock.json)
+        run: npm ci
+
+      - name: Tests
+        run: npm test -- --run
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format-Check
+        run: npm run format:check
+
+      # `vite build` verwendet `base: '/flag-football-stats/'` aus
+      # vite.config.ts – Asset-Pfade, Manifest (start_url/scope/id) und die
+      # PWA-Precache-Liste werden dadurch automatisch korrekt für die
+      # GitHub-Pages-Project-Page erzeugt. public/404.html und
+      # public/.nojekyll werden unverändert nach dist/ kopiert.
+      - name: Production-Build
+        run: npm run build
+
+      - name: GitHub Pages konfigurieren
+        uses: actions/configure-pages@v5
+
+      - name: dist/ als Pages-Artefakt hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages veröffentlichen
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Regensburg Phoenix – Live Stats</title>
+    <script type="text/javascript">
+      // GitHub Pages liefert diese Datei für JEDEN Pfad aus, der nicht
+      // physisch existiert – u. a. für einen direkten Aufruf oder Reload
+      // einer SPA-Unterroute wie /flag-football-stats/spiele/abc123, da GH
+      // Pages keine Server-Rewrites unterstützt.
+      //
+      // Etabliertes Muster für Vite/React-SPAs auf GitHub Pages
+      // ("spa-github-pages" von rafgraph): der aufgerufene Pfad wird in
+      // einen Query-String kodiert und auf die App-Wurzel umgeleitet;
+      // `src/main.tsx` liest diesen Query-String vor dem Start von React
+      // Router wieder aus und stellt den echten Pfad über
+      // `history.replaceState` wieder her (siehe dort sowie
+      // `src/pwa/githubPagesSpaRedirect.ts`, das exakt diese Logik als
+      // geprüfte Referenz-Implementierung enthält – dieses Skript hier MUSS
+      // aber als eigenständiges, bundling-unabhängiges Inline-Skript
+      // bestehen bleiben, da GitHub Pages für eine 404 kein gebautes
+      // JS-Bundle ausliefert).
+      //
+      // pathSegmentsToKeep = 1: die App liegt unter
+      // https://<user>.github.io/flag-football-stats/... – das erste
+      // Pfadsegment ("flag-football-stats") bleibt als App-Wurzel erhalten.
+      // Muss synchron zu `base` in vite.config.ts bleiben.
+      var pathSegmentsToKeep = 1;
+      var l = window.location;
+      l.replace(
+        l.protocol +
+          '//' +
+          l.hostname +
+          (l.port ? ':' + l.port : '') +
+          l.pathname
+            .split('/')
+            .slice(0, 1 + pathSegmentsToKeep)
+            .join('/') +
+          '/?/' +
+          l.pathname
+            .slice(1)
+            .split('/')
+            .slice(pathSegmentsToKeep)
+            .join('/')
+            .replace(/&/g, '~and~') +
+          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash,
+      );
+    </script>
+  </head>
+  <body></body>
+</html>

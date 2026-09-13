@@ -1,0 +1,9 @@
+dist
+dev-dist
+coverage
+node_modules
+public/icons
+package-lock.json
+
+# Fachliches Anforderungsdokument – bewusst nicht durch Tooling verändert
+PRD.md

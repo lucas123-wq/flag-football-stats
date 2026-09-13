@@ -1,0 +1,18 @@
+node_modules
+dist
+dev-dist
+coverage
+.vite
+*.tsbuildinfo
+*.local
+.env
+.env.*
+!.env.example
+
+# Claude Code: maschinen-/nutzerspezifische lokale Berechtigungen, nicht
+# Teil der geteilten Projektkonfiguration (die bleibt in .claude/launch.json).
+.claude/settings.local.json
+
+# Editor/OS
+.DS_Store
+Thumbs.db
