@@ -36,7 +36,10 @@ jobs:
       - name: Node.js einrichten
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Explizit Node 24 (LTS): jsdom 30 verlangt Node ^22.22.2 || ^24.15.0
+          # || >=26 (Node 20 scheitert an undici/`markAsUncloneable`); lokal
+          # entwickelt wird mit Node 24.
+          node-version: 24
           cache: npm
 
       - name: Abhängigkeiten installieren (reproduzierbar, aus package-lock.json)
